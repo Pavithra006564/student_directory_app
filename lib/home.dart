@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:student_directory_app/services.dart';
 
@@ -30,6 +31,9 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
+          emailcontroller.clear();
+          namecontroller.clear();
+          phonecontroller.clear();
           showDialog(
             context: context,
             builder: (context) {
@@ -113,12 +117,102 @@ class _HomeState extends State<Home> {
           return ListView.builder(
             itemCount: studentdata.length,
             itemBuilder: (context, index) {
-              return ListTile(title: Text(studentdata[index]['Name']),subtitle: Column(
-                children: [
-                  Text(studentdata[index]['Email']),
-                  Text(studentdata[index]['Phone number'])
-                ],
-              ),);
+              return ListTile(
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        namecontroller.text = studentdata[index]['Name'];
+                        emailcontroller.text = studentdata[index]['Email'];
+                        phonecontroller.text = studentdata[index]['Phone number'];
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Column(
+                              children: [
+                                TextFormField(
+                                  controller: namecontroller,
+                                  decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    label: Text("Name"),
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                TextFormField(
+                                  controller: emailcontroller,
+                                  decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    label: Text("Email"),
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                TextFormField(
+                                  controller: phonecontroller,
+                                  decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    label: Text("Phone number"),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    updatestudent(
+                                      studentdata[index].id,
+                                      namecontroller.text,
+                                      emailcontroller.text,
+                                      phonecontroller.text,
+                                      context,
+                                    );
+                                  },
+                                  child: Text(
+                                    "Update",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(
+                                      255,
+                                      2,
+                                      61,
+                                      109,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.edit),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        deletestudent(studentdata[index].id, context);
+                      },
+                      icon: Icon(Icons.delete),
+                    ),
+                  ],
+                ),
+                title: Text(studentdata[index]['Name']),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(studentdata[index]['Email']),
+                    Text(studentdata[index]['Phone number']),
+                  ],
+                ),
+              );
             },
           );
         },
